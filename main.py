@@ -5,12 +5,18 @@ import json
 import os
 
 load_dotenv()
-dry_run = bool(os.getenv('dry_run', False))
-artifactory_url = os.getenv('artifactory_url')
-token = os.getenv('token')
-repo_key = os.getenv('repoKey')
-path = os.getenv('path')
-lower_date = datetime.datetime.strptime(os.getenv('lower_date'), '%Y-%m-%d').date()
+
+dry_run = os.environ.get('dry_run', "False")
+artifactory_url = os.environ.get('artifactory_url')
+token = os.environ.get('token')
+repo_key = os.environ.get('repoKey')
+path = os.environ.get('path')
+lower_date = datetime.datetime.strptime(os.environ.get('lower_date'), '%Y-%m-%d').date()
+
+if dry_run == "False":
+    dry_run = False
+else:
+    dry_run = True
 
 
 def get(get_path):
@@ -34,11 +40,11 @@ def processing(processing_path):
     processing_data = get(processing_path)
     if not processing_data.get('children'):
         print(processing_path + " is empty dir")
-        if dry_run is True:
+        if dry_run is False:
             print("This folder now will be deleted \"processing_method\" " + processing_path)
             result = delete(processing_path)
             print(result)
-        elif dry_run is False:
+        elif dry_run is True:
             print("DRY RUN This folder will be deleted \"processing_method\" " + processing_path)
     for i in processing_data['children']:
         if i['folder']:
@@ -50,11 +56,11 @@ def processing(processing_path):
                     folder_full_lmd = folder_data.get('lastModified')  # full last modified date
                     folder_cropped_lmd = datetime.datetime.strptime(folder_full_lmd[:10], '%Y-%m-%d').date()  # cropped last modified date
                     if folder_cropped_lmd < lower_date:
-                        if dry_run is True:
+                        if dry_run is False:
                             print("This folder now will be deleted \"child_method\" "+child_path+" it`s last modified date is "+str(folder_cropped_lmd))
                             result = delete(child_path)
                             print(result)
-                        elif dry_run is False:
+                        elif dry_run is True:
                             print("DRY RUN This folder will be deleted \"child_method\" "+child_path+" it`s last modified date is "+str(folder_cropped_lmd))
                         else:
                             print("Folder "+child_path+" will not be deleted, iit`s last modified date is "+str(folder_cropped_lmd))
