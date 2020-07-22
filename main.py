@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-dry_run = os.environ.get('dry_run', "False")
+dry_run = os.environ.get('dry_run', "True")
 artifactory_url = os.environ.get('artifactory_url')
 token = os.environ.get('token')
 repo_key = os.environ.get('repoKey')
@@ -63,7 +63,7 @@ def processing(processing_path):
                         elif dry_run is True:
                             print("DRY RUN This folder will be deleted \"child_method\" "+child_path+" it`s last modified date is "+str(folder_cropped_lmd))
                         else:
-                            print("Folder "+child_path+" will not be deleted, iit`s last modified date is "+str(folder_cropped_lmd))
+                            print("Folder "+child_path+" will not be deleted, it`s last modified date is "+str(folder_cropped_lmd))
         else:
             end_folder = True
             return end_folder
