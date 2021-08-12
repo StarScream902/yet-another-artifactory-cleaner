@@ -38,22 +38,22 @@ def delete(delete_path):
 
 def processing(processing_path):
     # folder_size = 0
-    print("processing path is "+processing_path)
+    # print("processing path is "+processing_path)
     processing_data = get(processing_path)
     # process of the deleting empty dir
     if not processing_data.get('children'): # if dir is empty than delete dir
         print(processing_path + " is empty dir")
         if dry_run is False:
-            print("This folder now will be deleted \"processing_method\" " + processing_path)
+            print("This folder is empty and now will be deleted \"processing_method\" " + processing_path)
             result = delete(processing_path)
             print(result)
         elif dry_run is True:
-            print("DRY RUN This folder will be deleted \"processing_method\" " + processing_path)
+            print("DRY RUN This folder is empty and now will be deleted \"processing_method\" " + processing_path)
     # processing of all children
     for child in processing_data['children']:
-        print("processing the child "+json.dumps(child)+" from "+json.dumps(processing_data['children']))
+        # print("processing the child "+json.dumps(child)+" from "+json.dumps(processing_data['children']))
         if child['folder']:
-            print("child "+child['uri']+" is the folder")
+            # print("child "+child['uri']+" is the folder")
             child_path = processing_path + child['uri']
             # Enter in recursion
             children_of_child = processing(child_path)
