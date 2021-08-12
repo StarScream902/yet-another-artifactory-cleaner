@@ -24,6 +24,7 @@ def get(get_path):
     headers = {"Authorization": "Bearer " + token}
     res = requests.get(url, headers=headers)
     json_data = json.loads(res.text)
+    # print(json_data)
     return json_data
 
 
@@ -36,9 +37,11 @@ def delete(delete_path):
 
 
 def processing(processing_path):
-    folder_size = 0
+    # folder_size = 0
+    print("processing path is "+processing_path)
     processing_data = get(processing_path)
-    if not processing_data.get('children'):
+    # process of the deleting empty dir
+    if not processing_data.get('children'): # if dir is empty than delete dir
         print(processing_path + " is empty dir")
         if dry_run is False:
             print("This folder now will be deleted \"processing_method\" " + processing_path)
@@ -46,12 +49,20 @@ def processing(processing_path):
             print(result)
         elif dry_run is True:
             print("DRY RUN This folder will be deleted \"processing_method\" " + processing_path)
-    for i in processing_data['children']:
-        if i['folder']:
-            child_path = processing_path + i['uri']
-            children = processing(child_path)
-            if children is not None:
-                if children:
+    # processing of all children
+    for child in processing_data['children']:
+        print("processing the child "+json.dumps(child)+" from "+json.dumps(processing_data['children']))
+        if child['folder']:
+            print("child "+child['uri']+" is the folder")
+            child_path = processing_path + child['uri']
+            # Enter in recursion
+            children_of_child = processing(child_path)
+            # recursion will end when this call returns something, else will enter in recursion with new processing
+            # Exit from recursion when it is the last folder of branch
+            # when children of child is not the folder than go next
+            # this is the last folder
+            if children_of_child is not None:
+                if children_of_child:
                     folder_data = get(child_path)
                     folder_full_lmd = folder_data.get('lastModified')  # full last modified date
                     folder_cropped_lmd = datetime.datetime.strptime(folder_full_lmd[:10], '%Y-%m-%d').date()  # cropped last modified date
@@ -65,6 +76,7 @@ def processing(processing_path):
                         else:
                             print("Folder "+child_path+" will not be deleted, it`s last modified date is "+str(folder_cropped_lmd))
         else:
+            # this cild is not a folder
             end_folder = True
             return end_folder
             # child_method = processing_method + i['uri']
